@@ -101,15 +101,24 @@ function pruneDeletedRows_(validIds) {
   const validSet = new Set(validIds);
   const toDelete = existing.filter(id => !validSet.has(id));
   if (toDelete.length === 0) return;
-  UrlFetchApp.fetch(SUPABASE_URL + '/rest/v1/calendar?id=in.(' + toDelete.join(',') + ')', {
-    method: 'delete',
-    headers: {
-      apikey: getSupabaseServiceKey(),
-      Authorization: 'Bearer ' + getSupabaseServiceKey(),
-      Prefer: 'return=minimal',
-    },
-    muteHttpExceptions: true,
+
+  // Delete in small batches: every id goes into the query string, and Apps
+  // Script caps a fetch URL at ~2 KB ("Limit Exceeded: URLFetch URL Length").
+  // Ids are quoted so any comma/space in a stray id can't break the filter.
+  chunk_(toDelete, 40).forEach(part => {
+    const list = part.map(id => '"' + String(id).replace(/"/g, '') + '"').join(',');
+    UrlFetchApp.fetch(
+      SUPABASE_URL + '/rest/v1/calendar?id=in.(' + encodeURIComponent(list) + ')', {
+        method: 'delete',
+        headers: {
+          apikey: getSupabaseServiceKey(),
+          Authorization: 'Bearer ' + getSupabaseServiceKey(),
+          Prefer: 'return=minimal',
+        },
+        muteHttpExceptions: true,
+      });
   });
+  Logger.log('Removed ' + toDelete.length + ' stale rows.');
 }
 
 function chunk_(arr, size) {
