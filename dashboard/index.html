@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>non sibi marketing dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1f7;--surface:#ffffff;--ink:#15213f;--muted:#5d6885;--faint:#8a93ac;
+    --line:#d8deea;--brand:#1a3aa3;--brand-bright:#2f56d8;
+    --shadow:0 1px 2px rgba(21,33,63,.06), 0 8px 24px rgba(21,33,63,.06);--radius:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,select,textarea{font-family:inherit;font-size:14px;color:var(--ink)}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .shell{max-width:1080px;margin:0 auto;padding:28px 24px 64px}
+  .hidden{display:none!important}
+  .btn{padding:10px 15px;border-radius:8px;font-size:14px;font-weight:500;background:var(--brand);color:#fff;display:inline-flex;align-items:center;gap:7px;transition:background .12s}
+  .btn:hover{background:var(--brand-bright)}
+  .btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--brand-bright);background:var(--paper)}
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:6px}
+  .firm{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);font-weight:500}
+  h1{font-family:"Fraunces",serif;font-weight:500;font-size:clamp(30px,5vw,46px);line-height:1;letter-spacing:-.01em;margin-top:4px}
+  h1 em{font-style:italic;color:var(--brand)}
+  .tagline{color:var(--muted);font-size:14px;margin-top:8px;max-width:52ch}
+  .pulse{text-align:right;min-width:140px}
+  .pulse .count{font-family:"Fraunces",serif;font-size:40px;line-height:1;font-weight:500}
+  .pulse .count b{color:var(--brand);font-weight:500}
+  .pulse .label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+  .viewtabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);padding:4px;border-radius:10px;margin:24px 0 20px;box-shadow:var(--shadow);width:fit-content}
+  .viewtabs button{padding:9px 18px;border-radius:7px;font-size:14px;font-weight:500;color:var(--muted)}
+  .viewtabs button.on{background:var(--brand);color:#fff}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 18px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .search{flex:1;min-width:200px;position:relative}
+  .search input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--line);border-radius:8px;background:var(--paper);outline:none}
+  .search input:focus{border-color:var(--brand-bright);background:#fff}
+  .search svg{position:absolute;left:11px;top:11px;color:var(--faint)}
+  .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{padding:9px 13px;font-size:13px;color:var(--muted);background:#fff}
+  .seg button.on{background:var(--brand);color:#fff}
+  .group{margin-bottom:30px}
+  .group-head{display:flex;align-items:center;gap:10px;margin:0 2px 12px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .group-name{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:500}
+  .group-count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint)}
+  .group-rule{flex:1;height:1px;background:var(--line)}
+  .group-status{font-size:13px;color:var(--muted);margin:0 2px 12px;display:flex;align-items:center;gap:7px}
+  .group-status .pip{width:7px;height:7px;border-radius:50%;background:var(--brand);flex:none}
+  .group-status.clear .pip{background:#3a7d52}
+  .group-status b{color:var(--ink);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .tile{position:relative;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:var(--radius);padding:14px 14px 12px;text-align:left;width:100%;transition:transform .12s, box-shadow .12s;box-shadow:0 1px 2px rgba(21,33,63,.04)}
+  .tile:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .tile.checked{opacity:.5}
+  .tile .name{font-weight:600;font-size:15px;line-height:1.25;padding-right:18px}
+  .tile .slug{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tile .note{font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.35}
+  .tile .go{margin-top:11px;display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--brand)}
+  .tile:hover .go{color:var(--brand-bright)}
+  .tick{position:absolute;top:11px;right:11px;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--faint);background:#fff;transition:.12s}
+  .tick:hover{border-color:var(--brand-bright);color:var(--brand-bright)}
+  .tile.checked .tick{background:var(--brand);border-color:var(--brand);color:#fff}
+  .tile .edit{position:absolute;bottom:10px;right:11px;color:var(--faint);opacity:0;transition:.12s}
+  .tile:hover .edit{opacity:1}
+  .tile .edit:hover{color:var(--brand)}
+  .addtile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:1.5px dashed var(--line);background:transparent;color:var(--brand);border-radius:var(--radius);padding:14px;width:100%;min-height:104px;font-weight:500;font-size:14px;transition:.12s}
+  .addtile:hover{border-color:var(--brand-bright);background:var(--surface)}
+  .addtile span{font-size:24px;line-height:1}
+  .empty{text-align:center;padding:64px 24px;border:1px dashed var(--line);border-radius:var(--radius);background:var(--surface);color:var(--muted)}
+  .empty h2{font-family:"Fraunces",serif;font-weight:500;font-size:24px;color:var(--ink);margin-bottom:8px}
+  .empty p{max-width:44ch;margin:0 auto 18px}
+  .calbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px}
+  .calmonth{font-family:"Fraunces",serif;font-weight:500;font-size:24px}
+  .calnav{display:flex;gap:6px}
+  .calnav button{width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:17px;color:var(--ink)}
+  .calnav button:hover{background:var(--paper);border-color:var(--brand-bright)}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .dow{font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;color:var(--faint);text-align:center;padding:4px 0;text-transform:uppercase;letter-spacing:.06em}
+  .cell{background:var(--surface);border:1px solid var(--line);border-radius:9px;min-height:112px;padding:6px}
+  .cell.empty{background:transparent;border:none}
+  .cell.today{border-color:var(--brand-bright);box-shadow:0 0 0 1px var(--brand-bright)}
+  .daynum{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--faint);margin-bottom:5px;padding-left:2px}
+  .pcard{border:1px solid var(--line);border-left-width:4px;border-radius:7px;padding:5px 7px;margin-bottom:5px;background:#fff}
+  .pchip{display:inline-block;font-size:9px;font-weight:600;padding:2px 6px;border-radius:9px;margin-bottom:3px;letter-spacing:.02em}
+  .ptitle{font-size:11.5px;font-weight:600;line-height:1.25;color:var(--ink)}
+  .pmeta{margin-top:3px;font-size:9.5px;color:var(--faint);line-height:1.3}
+  .pstatus{font-weight:600;color:var(--muted)}
+  .pposted{color:#2e8a48;font-weight:700}
+  .callegend{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .lg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .lgsw{width:12px;height:12px;border-radius:3px}
+  .scrim{position:fixed;inset:0;background:rgba(21,33,63,.32);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .scrim.show{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:480px;width:100%;padding:24px;box-shadow:0 24px 64px rgba(21,33,63,.28);max-height:90vh;overflow:auto}
+  .modal h3{font-family:"Fraunces",serif;font-weight:500;font-size:22px;margin-bottom:4px}
+  .modal .sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:500;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);outline:none;font-family:inherit;font-size:14px}
+  .field textarea{resize:vertical;min-height:120px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.5}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand-bright);background:#fff}
+  .hint{font-size:12px;color:var(--faint);margin-top:6px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+  .modal-actions .danger{margin-right:auto;color:#b23a3a;font-size:13px;font-weight:500;padding:10px 0}
+  .tabs{display:flex;gap:4px;background:var(--paper);padding:4px;border-radius:9px;margin-bottom:18px}
+  .tabs button{flex:1;padding:8px;border-radius:6px;font-size:13px;color:var(--muted);font-weight:500}
+  .tabs button.on{background:#fff;color:var(--brand);box-shadow:0 1px 2px rgba(21,33,63,.08)}
+  .menu-sec{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+  .menu-sec:first-of-type{border-top:none;padding-top:0;margin-top:0}
+  .sec-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:10px}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer span[role=button]{cursor:pointer}
+  .synced{display:inline-flex;align-items:center;gap:6px}
+  .synced .live{width:7px;height:7px;border-radius:50%;background:#3a7d52}
+  @media (max-width:560px){.pulse{display:none}header.top{align-items:flex-start}.cell{min-height:88px}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell" id="app">
+  <header class="top">
+    <div>
+      <div class="firm">non sibi ventures</div>
+      <h1>marketing <em>dashboard</em></h1>
+      <p class="tagline" id="tagline">This week's LinkedIn plan across non sibi and RAVA — reads live from the master content calendar.</p>
+    </div>
+    <div class="pulse" id="pulse">
+      <div class="count"><b id="leftToday">0</b> / <span id="totalCount">0</span></div>
+      <div class="label">left to check today</div>
+    </div>
+  </header>
+  <div class="viewtabs">
+    <button data-v="calendar" class="on" id="tabCal">LinkedIn Calendar</button>
+    <button data-v="feed" id="tabFeed">LinkedIn Feed</button>
+  </div>
+  <div id="calendarView">
+    <div class="calbar">
+      <div class="calmonth" id="calMonth"></div>
+      <div class="calnav"><button id="calPrev">‹</button><button id="calToday" style="width:auto;padding:0 12px;font-size:13px">Today</button><button id="calNext">›</button></div>
+    </div>
+    <div class="calgrid" id="calDows"></div>
+    <div class="calgrid" id="calGrid"></div>
+    <div class="callegend" id="calLegend"></div>
+  </div>
+  <div id="feedView" class="hidden">
+    <div class="bar">
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="text" placeholder="Search name or company…">
+      </div>
+      <div class="seg" id="filterSeg">
+        <button data-f="all" class="on">All</button>
+        <button data-f="todo">To check</button>
+      </div>
+      <button class="btn" id="startRound">▷ Start sweep</button>
+      <button class="btn" id="addBtn">+ Add people</button>
+      <button class="btn ghost" id="menuBtn">⋯</button>
+    </div>
+    <div id="board"></div>
+    <footer>
+      <span class="synced"><span class="live"></span>Checks are saved on this device.</span>
+      <span role="button" id="resetCheck">↺ reset today's checks</span>
+    </footer>
+  </div>
+</div>
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h3 id="mTitle">Add people</h3>
+    <p class="sub">Paste a LinkedIn profile link and the rest fills in.</p>
+    <div class="tabs" id="addTabs">
+      <button data-t="one" class="on">One person</button>
+      <button data-t="bulk">Paste a list</button>
+    </div>
+    <div id="paneOne">
+      <div class="field"><label>LinkedIn URL or @slug</label>
+        <input id="fUrl" type="text" placeholder="linkedin.com/in/janedoe">
+        <div class="hint">Works for people (/in/…) and company pages (/company/…).</div>
+      </div>
+      <div class="field"><label>Display name</label><input id="fName" type="text" placeholder="Jane Doe"></div>
+      <div class="field"><label>Group</label><select id="fGroup"></select></div>
+      <div class="field"><label>Note (optional)</label><input id="fNote" type="text" placeholder="e.g. LP — quarterly check-in"></div>
+    </div>
+    <div id="paneBulk" style="display:none">
+      <div class="field"><label>One LinkedIn URL per line</label>
+        <textarea id="fBulk" placeholder="https://linkedin.com/in/janedoe&#10;https://linkedin.com/company/acme-robotics"></textarea>
+        <div class="hint">Names are guessed from each link — tidy them up afterward.</div>
+      </div>
+      <div class="field"><label>Add all to group</label><select id="fBulkGroup"></select></div>
+    </div>
+    <div class="modal-actions">
+      <button class="danger" id="deleteBtn" style="display:none">Remove</button>
+      <button class="btn ghost" id="cancelBtn">Cancel</button>
+      <button class="btn" id="saveBtn">Save</button>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="menuScrim">
+  <div class="modal">
+    <h3>Manage</h3>
+    <p class="sub">Groups for the Feed.</p>
+    <div class="menu-sec">
+      <div class="sec-title">Groups</div>
+      <div id="groupList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input id="newGroup" type="text" placeholder="New group name" style="flex:1;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--paper)">
+        <button class="btn ghost" id="addGroupBtn">Add</button>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="btn" id="menuClose">Done</button></div>
+  </div>
+</div>
+<div class="round" id="roundView" style="position:fixed;inset:0;background:linear-gradient(160deg,#16306f,#0d1b3d);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:60;color:#fff">
+  <button class="exit" id="roundExit" style="position:absolute;top:22px;right:24px;color:#9db0e0;font-size:13px">✕ Exit sweep</button>
+  <div class="progress" id="roundProgress" style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#9db0e0;margin-bottom:24px">— / —</div>
+  <div id="roundBody"></div>
+</div>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL = "https://mlrfmahsmjwtcozlxlyo.supabase.co";
+const SUPABASE_KEY = "sb_publishable_q-_Uqx5JghPsqjGJeDx4kQ_6Apu8Dve";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1hzvFhNAaScWUB7aQnr3-9juucc5L4ZPwQPXdUGSdElE/edit";
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+const today = function(){return new Date().toISOString().slice(0,10)};
+let groups=[], people=[], calRows=[], checks={}, filter="all", query="", refreshTimer=null, channel=null;
+try{ checks = JSON.parse(localStorage.getItem("nsChecks")||"{}"); }catch(e){ checks={}; }
+function saveChecks(){ localStorage.setItem("nsChecks", JSON.stringify(checks)); }
+let view="calendar";
+$("tabCal").onclick=function(){ setView("calendar"); };
+$("tabFeed").onclick=function(){ setView("feed"); };
+function setView(v){
+  view=v;
+  $("tabCal").classList.toggle("on",v==="calendar");
+  $("tabFeed").classList.toggle("on",v==="feed");
+  $("calendarView").classList.toggle("hidden",v!=="calendar");
+  $("feedView").classList.toggle("hidden",v==="calendar");
+  $("pulse").classList.toggle("hidden",v==="calendar");
+  $("tagline").textContent = v==="calendar"
+    ? "This week's LinkedIn plan across non sibi and RAVA — reads live from the master content calendar."
+    : "A daily sweep of the people worth watching on LinkedIn. One click jumps straight to anyone's latest posts.";
+  if(v==="calendar") renderCalendar(); else render();
+}
+boot();
+async function boot(){
+  await fetchAll();
+  subscribeRealtime();
+  setView("calendar");
+  setInterval(function(){ if(view==="feed") render(); }, 15*60*1000);
+}
+async function fetchAll(){
+  const [g,p,c] = await Promise.all([
+    supabase.from("groups").select("*").order("position",{ascending:true}),
+    supabase.from("people").select("*"),
+    supabase.from("calendar").select("*")
+  ]);
+  groups = g.data || [];
+  people = p.data || [];
+  calRows = c.data || [];
+}
+function scheduleRefresh(){ clearTimeout(refreshTimer); refreshTimer=setTimeout(async function(){ await fetchAll(); if(view==="calendar")renderCalendar(); else render(); }, 400); }
+function subscribeRealtime(){
+  if(channel) return;
+  channel = supabase.channel("dash")
+    .on("postgres_changes",{event:"*",schema:"public",table:"groups"}, scheduleRefresh)
+    .on("postgres_changes",{event:"*",schema:"public",table:"people"}, scheduleRefresh)
+    .on("postgres_changes",{event:"*",schema:"public",table:"calendar"}, scheduleRefresh)
+    .subscribe();
+}
+const THEMES = {
+  "Event Promo":        ["#1a3aa3","#e6ebf7","#1a3aa3"],
+  "Event Recap":        ["#4a6fc4","#eaeff8","#34579f"],
+  "Investor Spotlight": ["#9b3fb0","#f4e9f6","#7f2a94"],
+  "Partner Spotlight":  ["#c07fd0","#f7eef9","#8f4f9f"],
+  "Interview":          ["#6a3f9e","#efe9f6","#5a2f88"],
+  "Thought Leadership": ["#b07a1e","#f7efdc","#7a5410"],
+  "Article/Chart":      ["#1f8a7a","#e3f2ef","#14675a"],
+  "Announcement":       ["#2e8a48","#e6f2ea","#1f6634"],
+  "Repost":             ["#9aa0ad","#eef0f4","#5d6885"],
+  "Other":              ["#b9c0cf","#eef0f4","#5d6885"]
+};
+function themeKey(t){
+  var s=(t||"").toLowerCase();
+  if(s.indexOf("promo")>=0) return "Event Promo";
+  if(s.indexOf("recap")>=0) return "Event Recap";
+  if(s.indexOf("investor")>=0) return "Investor Spotlight";
+  if(s.indexOf("partner")>=0) return "Partner Spotlight";
+  if(s.indexOf("interview")>=0||s.indexOf("leadership")>=0) return "Interview";
+  if(s.indexOf("thought")>=0) return "Thought Leadership";
+  if(s.indexOf("article")>=0||s.indexOf("chart")>=0) return "Article/Chart";
+  if(s.indexOf("repost")>=0) return "Repost";
+  if(s.indexOf("announce")>=0) return "Announcement";
+  return "Other";
+}
+const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+let curMonth = new Date(); curMonth.setDate(1);
+$("calPrev").onclick=function(){ curMonth.setMonth(curMonth.getMonth()-1); renderCalendar(); };
+$("calNext").onclick=function(){ curMonth.setMonth(curMonth.getMonth()+1); renderCalendar(); };
+$("calToday").onclick=function(){ curMonth=new Date(); curMonth.setDate(1); renderCalendar(); };
+function isPosted(link){ return /linkedin\.com/i.test((link||"").trim()); }
+function renderCalendar(){
+  $("calMonth").textContent = MN[curMonth.getMonth()]+" "+curMonth.getFullYear();
+  var dows=$("calDows"); dows.innerHTML="";
+  DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dow"; e.textContent=d; dows.appendChild(e); });
+  var grid=$("calGrid"); grid.innerHTML="";
+  var y=curMonth.getFullYear(), m=curMonth.getMonth();
+  var first=new Date(y,m,1).getDay();
+  var days=new Date(y,m+1,0).getDate();
+  var todayStr=today();
+  for(var i=0;i<first;i++){ var e=document.createElement("div"); e.className="cell empty"; grid.appendChild(e); }
+  for(var day=1;day<=days;day++){
+    var ds=y+"-"+String(m+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+    var cell=document.createElement("div"); cell.className="cell"+(ds===todayStr?" today":"");
+    cell.style.cursor="pointer"; cell.title="Open the master calendar";
+    cell.innerHTML='<div class="daynum">'+day+'</div>';
+    cell.onclick=function(){ window.open(SHEET_URL,"_blank","noopener"); };
+    calRows.filter(function(p){ return p.sort_date===ds; }).forEach(function(p){
+      var key=themeKey(p.theme), col=THEMES[key];
+      var posted=isPosted(p.link);
+      var card=document.createElement("div"); card.className="pcard"; card.style.borderLeftColor=col[0];
+var raw=(p.link||"").trim();
+      var hasLink = /^(https?:\/\/)?[^\s]+\.[^\s]+/i.test(raw) && !/\s/.test(raw);
+            if(hasLink){ card.style.cursor="pointer"; card.title=posted?"Open the live post":"Open the draft"; }
+      card.innerHTML=
+        '<span class="pchip" style="background:'+col[1]+';color:'+col[2]+'">'+esc(key)+'</span>'+
+        '<div class="ptitle">'+esc(p.working_title||p.topic||"(untitled)")+'</div>'+
+        '<div class="pmeta"><span class="pstatus">'+esc(p.status||"—")+'</span>'+
+        (p.posting_from?' · '+esc(p.posting_from):'')+
+        (posted?' · <span class="pposted">✓ posted</span>':(hasLink?' · <span style="color:var(--brand)">draft</span>':''))+'</div>';
+      card.onclick=function(e){
+        e.stopPropagation();
+        if(hasLink){
+          var u=(p.link||"").trim();
+          if(!/^https?:\/\//i.test(u)) u="https://"+u;   // fix links missing https://
+          window.open(u,"_blank","noopener");
+        } else {
+          window.open(SHEET_URL,"_blank","noopener");
+        }
+      };
+      cell.appendChild(card);
+    });
+    grid.appendChild(cell);
+  }
+  var lg=$("calLegend"); lg.innerHTML="";
+  Object.keys(THEMES).forEach(function(t){ if(t==="Other")return;
+    var e=document.createElement("div"); e.className="lg";
+    e.innerHTML='<span class="lgsw" style="background:'+THEMES[t][0]+'"></span>'+t; lg.appendChild(e); });
+}
+function uid(){return "p"+Math.random().toString(36).slice(2,9)}
+function groupById(id){return groups.find(function(g){return g.id===id})||groups[0]}
+function isChecked(p){ return !!checks[p.id] && String(checks[p.id]).slice(0,10)===today(); }
+function relTime(iso){ if(!iso) return ""; const d=Date.now()-Date.parse(iso); if(isNaN(d))return ""; const mn=Math.round(d/60000); if(mn<1)return "just now"; if(mn<60)return mn+" min ago"; const h=Math.round(mn/60); return h+(h===1?" hr ago":" hrs ago"); }
+function parseLinkedIn(raw){
+  if(!raw) return null;
+  let s=raw.trim(), type="in", slug="";
+  const mm=s.match(/linkedin\.com\/(in|company|school)\/([^\/?#\s]+)/i);
+  if(mm){ type=(mm[1].toLowerCase()==="in")?"in":"company"; slug=mm[2]; }
+  else { slug=s.replace(/^@/,"").replace(/\/.*$/,"").replace(/\s+/g,""); }
+  slug=decodeURIComponent(slug);
+  const name=slug.replace(/-/g," ").replace(/\b\w/g,function(c){return c.toUpperCase()}).replace(/\s\d+$/,"").trim();
+  return {type,slug,name};
+}
+function activityUrl(p){ return p.type==="company" ? "https://www.linkedin.com/company/"+p.slug+"/posts/" : "https://www.linkedin.com/in/"+p.slug+"/recent-activity/all/"; }
+function statusLine(g){
+  const members=people.filter(function(p){return p.group_id===g.id});
+  const total=members.length; if(total===0) return null;
+  const done=members.filter(isChecked); const pending=total-done.length;
+  if(pending===0) return {clear:true,html:"All <b>"+total+"</b> checked today"};
+  if(done.length===0) return {clear:false,html:"<b>"+total+"</b> to check · none opened yet today"};
+  const last=done.slice().sort(function(a,b){return String(checks[b.id]).localeCompare(String(checks[a.id]))})[0];
+  return {clear:false,html:"<b>"+pending+"</b> of "+total+" still to check · last opened "+esc(last.name)+", "+relTime(checks[last.id])};
+}
+function render(){
+  const board=$("board"); if(!board) return; board.innerHTML="";
+  $("totalCount").textContent = people.length;
+  $("leftToday").textContent = people.filter(function(p){return !isChecked(p)}).length;
+  if(people.length===0){
+    board.innerHTML='<div class="empty"><h2>No one here yet</h2><p>Add the LPs, investors, teammates, and voices to keep up with.</p><button class="btn" id="emptyAdd">+ Add the first person</button></div>';
+    $("emptyAdd").onclick=openAdd; return;
+  }
+  const q=query.toLowerCase();
+  groups.forEach(function(g){
+    const ppl=people.filter(function(p){
+      if(p.group_id!==g.id) return false;
+      if(filter==="todo" && isChecked(p)) return false;
+      if(q && (p.name+" "+p.slug+" "+(p.note||"")).toLowerCase().indexOf(q)<0) return false;
+      return true;
+    });
+    if(ppl.length===0) return;
+    const sec=document.createElement("div"); sec.className="group";
+    const st=statusLine(g);
+    sec.innerHTML='<div class="group-head"><span class="dot" style="background:'+esc(g.color)+'"></span>'+
+      '<span class="group-name">'+esc(g.name)+'</span><span class="group-count mono">'+ppl.length+'</span><span class="group-rule"></span></div>'+
+      (st?'<div class="group-status'+(st.clear?' clear':'')+'"><span class="pip"></span><span>'+st.html+'</span></div>':'')+
+      '<div class="grid"></div>';
+    const gr=sec.querySelector(".grid");
+    ppl.forEach(function(p){ gr.appendChild(tile(p,g)); });
+    board.appendChild(sec);
+  });
+  const wrap=document.createElement("div"); wrap.className="grid";
+  const add=document.createElement("button"); add.className="addtile"; add.innerHTML='<span>+</span>Add more people'; add.onclick=openAdd;
+  wrap.appendChild(add); board.appendChild(wrap);
+}
+function tile(p,g){
+  const d=document.createElement("div");
+  d.className="tile"+(isChecked(p)?" checked":""); d.style.borderLeftColor=g.color;
+  d.innerHTML='<button class="tick" title="Mark checked">'+(isChecked(p)?"✓":"")+'</button>'+
+    '<div class="name">'+esc(p.name)+'</div>'+
+    '<div class="slug mono">'+(p.type==="company"?"/company/":"/in/")+esc(p.slug)+'</div>'+
+    (p.note?'<div class="note">'+esc(p.note)+'</div>':'')+
+    '<span class="go">Open latest posts <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></span>'+
+    '<button class="edit" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 4 6 6M3 21l1-5L17 3l4 4L8 20z"/></svg></button>';
+  d.onclick=function(e){ if(e.target.closest(".tick")||e.target.closest(".edit"))return; window.open(activityUrl(p),"_blank","noopener"); markChecked(p,true); };
+  d.querySelector(".tick").onclick=function(e){ e.stopPropagation(); markChecked(p, !isChecked(p)); };
+  d.querySelector(".edit").onclick=function(e){ e.stopPropagation(); openEdit(p); };
+  return d;
+}
+function markChecked(p, on){
+  if(on){ checks[p.id]=new Date().toISOString(); } else { delete checks[p.id]; }
+  saveChecks(); render();
+}
+let editing=null, addTab="one";
+function fillGroupSelects(){ const o=groups.map(function(g){return '<option value="'+g.id+'">'+esc(g.name)+'</option>'}).join(""); $("fGroup").innerHTML=o; $("fBulkGroup").innerHTML=o; }
+function setAddTab(){ $("paneOne").style.display=addTab==="one"?"block":"none"; $("paneBulk").style.display=addTab==="bulk"?"block":"none"; document.querySelectorAll("#addTabs button").forEach(function(b){b.classList.toggle("on",b.dataset.t===addTab)}); $("addTabs").style.display=editing?"none":"flex"; }
+function openAdd(){ editing=null; addTab="one"; setAddTab(); $("mTitle").textContent="Add people"; $("deleteBtn").style.display="none"; $("fUrl").value="";$("fName").value="";$("fNote").value="";$("fBulk").value=""; fillGroupSelects(); $("scrim").classList.add("show"); $("fUrl").focus(); }
+function openEdit(p){ editing=p; addTab="one"; setAddTab(); $("mTitle").textContent="Edit person"; $("deleteBtn").style.display="block"; $("fUrl").value=(p.type==="company"?"/company/":"/in/")+p.slug; $("fName").value=p.name; $("fNote").value=p.note||""; fillGroupSelects(); $("fGroup").value=p.group_id; $("scrim").classList.add("show"); $("fName").focus(); }
+function closeAdd(){ $("scrim").classList.remove("show"); }
+document.querySelectorAll("#addTabs button").forEach(function(b){ b.onclick=function(){addTab=b.dataset.t; setAddTab();}; });
+$("fUrl").addEventListener("blur",function(){ if($("fName").value.trim())return; const p=parseLinkedIn($("fUrl").value); if(p)$("fName").value=p.name; });
+$("addBtn").onclick=openAdd; $("cancelBtn").onclick=closeAdd;
+$("scrim").addEventListener("click",function(e){ if(e.target===$("scrim"))closeAdd(); });
+$("saveBtn").onclick=async function(){
+  if(addTab==="bulk" && !editing){
+    const grp=$("fBulkGroup").value;
+    const rows=$("fBulk").value.split("\n").map(function(x){return x.trim()}).filter(Boolean).map(function(line){
+      const p=parseLinkedIn(line); if(!p||!p.slug)return null;
+      return {id:uid(),name:p.name,slug:p.slug,type:p.type,group_id:grp,note:""};
+    }).filter(Boolean);
+    if(rows.length){ people=people.concat(rows); render(); closeAdd(); await supabase.from("people").insert(rows); }
+    else closeAdd();
+    return;
+  }
+  const parsed=parseLinkedIn($("fUrl").value);
+  if(!parsed||!parsed.slug){ $("fUrl").focus(); return; }
+  const name=$("fName").value.trim()||parsed.name;
+  if(editing){
+    Object.assign(editing,{name,slug:parsed.slug,type:parsed.type,group_id:$("fGroup").value,note:$("fNote").value.trim()});
+    render(); closeAdd();
+    await supabase.from("people").update({name:editing.name,slug:editing.slug,type:editing.type,group_id:editing.group_id,note:editing.note}).eq("id",editing.id);
+  } else {
+    const row={id:uid(),name,slug:parsed.slug,type:parsed.type,group_id:$("fGroup").value,note:$("fNote").value.trim()};
+    people.push(row); render(); closeAdd();
+    await supabase.from("people").insert(row);
+  }
+};
+$("deleteBtn").onclick=async function(){ if(editing){ const id=editing.id; people=people.filter(function(p){return p.id!==id}); render(); closeAdd(); await supabase.from("people").delete().eq("id",id); } else closeAdd(); };
+function renderGroups(){
+  const list=$("groupList"); list.innerHTML="";
+  groups.forEach(function(g){
+    const row=document.createElement("div"); row.style.cssText="display:flex;align-items:center;gap:8px";
+    row.innerHTML='<input type="color" value="'+esc(g.color)+'" style="width:30px;height:30px;border:none;background:none;padding:0;cursor:pointer">'+
+      '<input type="text" value="'+esc(g.name)+'" style="flex:1;padding:8px 10px;border:1px solid var(--line);border-radius:7px;background:var(--paper)">'+
+      '<button title="Delete group" style="color:var(--faint);padding:6px">✕</button>';
+    const ins=row.querySelectorAll("input"), color=ins[0], nameI=ins[1];
+    color.oninput=async function(){ g.color=color.value; render(); await supabase.from("groups").update({color:g.color}).eq("id",g.id); };
+    nameI.onchange=async function(){ g.name=nameI.value.trim()||g.name; fillGroupSelects(); render(); await supabase.from("groups").update({name:g.name}).eq("id",g.id); };
+    row.querySelector("button").onclick=async function(){
+      if(groups.length<=1) return;
+      const fb=groups.find(function(x){return x!==g});
+      const moved=people.filter(function(p){return p.group_id===g.id});
+      moved.forEach(function(p){p.group_id=fb.id});
+      groups=groups.filter(function(x){return x!==g});
+      renderGroups(); fillGroupSelects(); render();
+      for(const p of moved){ await supabase.from("people").update({group_id:fb.id}).eq("id",p.id); }
+      await supabase.from("groups").delete().eq("id",g.id);
+    };
+    list.appendChild(row);
+  });
+}
+$("menuBtn").onclick=function(){ renderGroups(); $("menuScrim").classList.add("show"); };
+$("menuClose").onclick=function(){ $("menuScrim").classList.remove("show"); render(); };
+$("menuScrim").addEventListener("click",function(e){ if(e.target===$("menuScrim")){$("menuScrim").classList.remove("show"); render();} });
+$("addGroupBtn").onclick=async function(){
+  const n=$("newGroup").value.trim(); if(!n)return;
+  const palette=["#1a3aa3","#2f8f83","#b06a2c","#7a4fb0","#a8324a","#3a7d52","#2c6fb0","#8a8030"];
+  const row={id:uid(),name:n,color:palette[groups.length%palette.length],position:groups.length};
+  groups.push(row); $("newGroup").value=""; renderGroups(); fillGroupSelects(); render();
+  await supabase.from("groups").insert(row);
+};
+$("search").addEventListener("input",function(e){ query=e.target.value; render(); });
+document.querySelectorAll("#filterSeg button").forEach(function(b){ b.onclick=function(){ filter=b.dataset.f; document.querySelectorAll("#filterSeg button").forEach(function(x){x.classList.toggle("on",x===b)}); render(); }; });
+$("resetCheck").onclick=function(){ checks={}; saveChecks(); render(); };
+let roundList=[], roundIdx=0;
+$("startRound").onclick=function(){
+  roundList=people.filter(function(p){return !isChecked(p)});
+  if(roundList.length===0) roundList=people.slice();
+  if(roundList.length===0){ openAdd(); return; }
+  roundIdx=0; $("roundView").style.display="flex"; renderRound();
+};
+function renderRound(){
+  const body=$("roundBody");
+  if(roundIdx>=roundList.length){ $("roundProgress").textContent=roundList.length+" / "+roundList.length;
+    body.innerHTML='<div class="done" style="text-align:center"><div class="big" style="font-family:Fraunces,serif;font-size:38px;margin-bottom:10px">Sweep complete</div><p style="color:#c9d4ef">You\'ve been through everyone.</p><div class="nav" style="margin-top:26px"><button id="rDone" style="color:#c9d4ef;font-size:14px;padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.18)">Back to board</button></div></div>';
+    $("rDone").onclick=exitRound; return; }
+  const p=roundList[roundIdx], g=groupById(p.group_id);
+  $("roundProgress").textContent=(roundIdx+1)+" / "+roundList.length;
+  body.innerHTML='<div class="card" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:40px;max-width:460px;width:100%;text-align:center">'+
+    '<div class="grp" style="font-family:IBM Plex Mono,monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9db0e0;margin-bottom:14px">'+esc(g?g.name:"")+'</div>'+
+    '<div class="who" style="font-family:Fraunces,serif;font-size:34px;line-height:1.05">'+esc(p.name)+'</div>'+
+    '<div class="handle" style="font-family:IBM Plex Mono,monospace;font-size:13px;color:#9db0e0;margin-top:8px">'+(p.type==="company"?"/company/":"/in/")+esc(p.slug)+'</div>'+
+    (p.note?'<div class="rnote" style="color:#c9d4ef;font-size:14px;margin-top:14px">'+esc(p.note)+'</div>':'')+
+    '<button class="open" id="rOpen" style="margin-top:26px;background:#fff;color:var(--brand);padding:14px 22px;border-radius:10px;font-size:15px;font-weight:600;display:inline-flex;gap:8px;align-items:center">Open latest posts</button>'+
+    '<div class="nav" style="display:flex;gap:12px;margin-top:26px;justify-content:center"><button id="rSkip" style="color:#c9d4ef;font-size:14px;padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.18)">Skip</button><button id="rNext" style="color:#c9d4ef;font-size:14px;padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.18)">Checked, next →</button></div></div>';
+  $("rOpen").onclick=function(){ window.open(activityUrl(p),"_blank","noopener"); markChecked(p,true); };
+  $("rSkip").onclick=function(){ roundIdx++; renderRound(); };
+  $("rNext").onclick=function(){ markChecked(p,true); roundIdx++; renderRound(); };
+}
+function exitRound(){ $("roundView").style.display="none"; render(); }
+$("roundExit").onclick=exitRound;
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ closeAdd(); $("menuScrim").classList.remove("show"); if($("roundView").style.display==="flex")exitRound(); } });
+</script>
+</body>
+</html>
