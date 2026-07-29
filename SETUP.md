@@ -27,8 +27,9 @@ not this Claude session (or any browser tab) is open.
 
 1. Open the master Google Sheet → **Extensions → Apps Script**.
 2. Delete the default empty `Code.gs`.
-3. For each file in `apps-script/` (`Config.gs`, `Sync.gs`, `Emails.gs`, `Triggers.gs`), create a
-   matching file in the Apps Script editor (File → New → Script file) and paste its contents.
+3. For each file in `apps-script/` (`Config.gs`, `Sync.gs`, `Emails.gs`, `Triggers.gs`,
+   `Menu.gs`), create a matching file in the Apps Script editor (File → New → Script file) and
+   paste its contents.
 4. For `appsscript.json`: click the gear icon (Project Settings) → check "Show `appsscript.json`
    manifest file in editor" → open it from the file list → replace its contents with
    `apps-script/appsscript.json`.
@@ -48,6 +49,20 @@ not this Claude session (or any browser tab) is open.
    as you, and make external requests to Supabase) — review and allow it.
 3. Check Triggers (clock icon, left sidebar) — you should see 5 triggers: an on-edit sync, a
    15-minute backstop sync, and the three weekly email jobs.
+
+### If the Run button / function dropdown isn't visible
+
+Apps Script hides the `▷ Run` control and the function dropdown whenever `appsscript.json`
+(or an HTML file) is the file you're viewing — they only appear for `.gs` script files. Click
+any `.gs` file in the left-hand file list and the toolbar comes back.
+
+`Menu.gs` also adds a **"non sibi"** menu to the spreadsheet itself (reload the Sheet after
+saving), which can run the same jobs without opening the editor at all:
+
+- *Sync calendar to dashboard now*
+- *Install/reinstall scheduled jobs*
+- *Send me a test preview (just me)* — the Thursday email, sent only to you
+- *Run Wednesday reminder check*
 
 ## 5. Test before trusting the schedule
 
