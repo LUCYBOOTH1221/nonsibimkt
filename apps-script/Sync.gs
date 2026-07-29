@@ -18,7 +18,7 @@ function syncCalendarToSupabase() {
 //   E Theme | F Topic | G Working title | H CTA/Next step | I Channel
 //   J Status | K Link to copy | L Repost To | M Notes
 function readCalendarRows_() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TAB_NAME);
+  const sheet = getSpreadsheet_().getSheetByName(SHEET_TAB_NAME);
   if (!sheet) throw new Error('No "' + SHEET_TAB_NAME + '" tab found in this spreadsheet.');
   const values = sheet.getDataRange().getValues();
   const rows = [];

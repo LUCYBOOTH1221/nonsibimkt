@@ -1,7 +1,10 @@
 /**
  * Adds a "non sibi" menu to the Sheet itself, so the automation can be run
- * without touching the Apps Script editor. Reload the spreadsheet after
- * saving this file and the menu appears next to Help.
+ * without touching the Apps Script editor.
+ *
+ * NOTE: this only fires when the script lives INSIDE the spreadsheet
+ * (Extensions > Apps Script). In a standalone project it never runs, which is
+ * harmless -- everything is still runnable from the editor's Run button.
  */
 function onOpen() {
   SpreadsheetApp.getUi()
@@ -48,5 +51,12 @@ function sendTestPreviewToMe() {
     htmlBody: wrapEmail_(body),
   });
 
-  SpreadsheetApp.getUi().alert('Test preview sent to ' + me);
+  // getUi() only exists when the script is bound to the Sheet; in a standalone
+  // project fall back to the execution log so this never errors out.
+  Logger.log('Test preview sent to ' + me);
+  try {
+    SpreadsheetApp.getUi().alert('Test preview sent to ' + me);
+  } catch (err) {
+    // standalone project -- no spreadsheet UI to show an alert in
+  }
 }

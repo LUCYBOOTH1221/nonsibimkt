@@ -12,7 +12,7 @@ function installTriggers() {
 
   // Push sheet edits to Supabase almost immediately.
   ScriptApp.newTrigger('onCalendarEdit')
-    .forSpreadsheet(SpreadsheetApp.getActiveSpreadsheet())
+    .forSpreadsheet(SHEET_ID)
     .onEdit()
     .create();
 

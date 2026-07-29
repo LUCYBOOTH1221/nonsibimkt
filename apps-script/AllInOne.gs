@@ -4,9 +4,8 @@
  * This ONE file contains everything: config, sheet->Supabase sync, the
  * 3x/week email cadence, trigger installation, and the in-Sheet menu.
  *
- * Paste the whole thing into a single script file in the Apps Script editor.
- * You do NOT also need Config.gs / Sync.gs / Emails.gs / Triggers.gs /
- * Menu.gs -- those are this same code, just split up for readability.
+ * Works either as a standalone script project or bound to the Sheet
+ * (Extensions > Apps Script) -- it opens the spreadsheet by ID either way.
  */
 
 // ==========================================================================
@@ -18,7 +17,16 @@
  * To add/remove a teammate, edit the TEAM map -- everything else reads from it.
  */
 
+// The master content calendar spreadsheet. Opening it by ID means this script
+// works whether it lives inside the Sheet (Extensions > Apps Script) or as a
+// standalone project at script.google.com.
+const SHEET_ID = '1hzvFhNAaScWUB7aQnr3-9juucc5L4ZPwQPXdUGSdElE';
+
 const SHEET_TAB_NAME = 'Calendar';
+
+function getSpreadsheet_() {
+  return SpreadsheetApp.openById(SHEET_ID);
+}
 
 const SUPABASE_URL = 'https://mlrfmahsmjwtcozlxlyo.supabase.co';
 
@@ -86,7 +94,7 @@ function syncCalendarToSupabase() {
 //   E Theme | F Topic | G Working title | H CTA/Next step | I Channel
 //   J Status | K Link to copy | L Repost To | M Notes
 function readCalendarRows_() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_TAB_NAME);
+  const sheet = getSpreadsheet_().getSheetByName(SHEET_TAB_NAME);
   if (!sheet) throw new Error('No "' + SHEET_TAB_NAME + '" tab found in this spreadsheet.');
   const values = sheet.getDataRange().getValues();
   const rows = [];
@@ -387,7 +395,7 @@ function installTriggers() {
 
   // Push sheet edits to Supabase almost immediately.
   ScriptApp.newTrigger('onCalendarEdit')
-    .forSpreadsheet(SpreadsheetApp.getActiveSpreadsheet())
+    .forSpreadsheet(SHEET_ID)
     .onEdit()
     .create();
 
@@ -420,8 +428,11 @@ function removeAllTriggers_() {
 
 /**
  * Adds a "non sibi" menu to the Sheet itself, so the automation can be run
- * without touching the Apps Script editor. Reload the spreadsheet after
- * saving this file and the menu appears next to Help.
+ * without touching the Apps Script editor.
+ *
+ * NOTE: this only fires when the script lives INSIDE the spreadsheet
+ * (Extensions > Apps Script). In a standalone project it never runs, which is
+ * harmless -- everything is still runnable from the editor's Run button.
  */
 function onOpen() {
   SpreadsheetApp.getUi()
@@ -468,6 +479,13 @@ function sendTestPreviewToMe() {
     htmlBody: wrapEmail_(body),
   });
 
-  SpreadsheetApp.getUi().alert('Test preview sent to ' + me);
+  // getUi() only exists when the script is bound to the Sheet; in a standalone
+  // project fall back to the execution log so this never errors out.
+  Logger.log('Test preview sent to ' + me);
+  try {
+    SpreadsheetApp.getUi().alert('Test preview sent to ' + me);
+  } catch (err) {
+    // standalone project -- no spreadsheet UI to show an alert in
+  }
 }
 

@@ -3,7 +3,16 @@
  * To add/remove a teammate, edit the TEAM map -- everything else reads from it.
  */
 
+// The master content calendar spreadsheet. Opening it by ID means this script
+// works whether it lives inside the Sheet (Extensions > Apps Script) or as a
+// standalone project at script.google.com.
+const SHEET_ID = '1hzvFhNAaScWUB7aQnr3-9juucc5L4ZPwQPXdUGSdElE';
+
 const SHEET_TAB_NAME = 'Calendar';
+
+function getSpreadsheet_() {
+  return SpreadsheetApp.openById(SHEET_ID);
+}
 
 const SUPABASE_URL = 'https://mlrfmahsmjwtcozlxlyo.supabase.co';
 
