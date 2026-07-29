@@ -119,8 +119,12 @@ function sendWednesdayReminder() {
   });
 }
 
+// A row counts as published once a real LinkedIn post link lands in it --
+// dropping the link is the signal, regardless of whether anyone remembered to
+// flip Status to "Live". This matches how the dashboard marks a card "posted",
+// so the calendar and the reminder emails never disagree.
 function isLive_(r) {
-  return /linkedin\.com/i.test(r.link || '') && /live/i.test(r.status || '');
+  return /linkedin\.com/i.test(r.link || '');
 }
 
 function renderRowHtml_(r, standalone) {
