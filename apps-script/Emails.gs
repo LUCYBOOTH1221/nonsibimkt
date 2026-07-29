@@ -4,7 +4,7 @@
  *    team, calling out by name anyone whose assigned content isn't Live yet.
  *  - Monday 8:00 AM CDT (week of the post): same view for THIS week, resent
  *    to the whole team to review or discuss in the team meeting.
- *  - Wednesday 4:00 PM CDT reminder: for any post targeted to go live today,
+ *  - Wednesday 12:00 PM CDT reminder: for any post targeted to go live today,
  *    check whether it's actually posted (Live status + a real linkedin.com
  *    link). If not, nudge the assignee + the boss with a link to the dashboard.
  *
