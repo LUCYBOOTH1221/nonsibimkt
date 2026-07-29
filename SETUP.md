@@ -63,8 +63,8 @@ From the function dropdown, run each of these manually once and confirm the resu
 - **Team roster**: edit the `TEAM` map at the top of `Config.gs` to add/remove people. Matching
   is by first name, case-insensitive, against the "Posting from" column.
 - **Boss / cc**: `BOSS_EMAIL` in `Config.gs` (currently `lucy@nonsibi.vc`).
-- **Wednesday reminder time**: picked 4:00 PM CDT (giving all day Wednesday to post before
-  nudging) — change the `atHour(16)` in `Triggers.gs` if you'd rather it fire earlier/later.
+- **Wednesday reminder time**: 12:00 PM CDT — change the `atHour(12)` in `Triggers.gs` if
+  you'd rather it fire earlier/later.
 - **"Posted" detection**: a row counts as live once its Status is "Live" *and* its link column
   contains a real `linkedin.com` URL — matching the same check the dashboard itself uses.
 - **calendar table is read-only from the browser**: only the Apps Script sync (via the

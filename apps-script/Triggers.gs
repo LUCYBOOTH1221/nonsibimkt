@@ -28,9 +28,9 @@ function installTriggers() {
   ScriptApp.newTrigger('sendMondayReview').timeBased()
     .onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(8).nearMinute(0).create();
 
-  // Wednesday 4:00 PM -- reminder if today's post hasn't gone live yet.
+  // Wednesday 12:00 PM -- reminder if today's post hasn't gone live yet.
   ScriptApp.newTrigger('sendWednesdayReminder').timeBased()
-    .onWeekDay(ScriptApp.WeekDay.WEDNESDAY).atHour(16).nearMinute(0).create();
+    .onWeekDay(ScriptApp.WeekDay.WEDNESDAY).atHour(12).nearMinute(0).create();
 
   Logger.log('Triggers installed. These fire in the timezone set in appsscript.json (America/Chicago = CDT/CST).');
 }
